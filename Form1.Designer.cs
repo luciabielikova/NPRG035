@@ -61,13 +61,12 @@
             0,
             0,
             0});
-            this.numericUpDown1.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged_1);
             // 
             // numericUpDown2
             // 
             this.numericUpDown2.Location = new System.Drawing.Point(370, 165);
             this.numericUpDown2.Maximum = new decimal(new int[] {
-            20,
+            15,
             0,
             0,
             0});
@@ -84,7 +83,6 @@
             0,
             0,
             0});
-            this.numericUpDown2.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged_2);
             // 
             // label1
             // 
