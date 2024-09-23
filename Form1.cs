@@ -1,4 +1,4 @@
-namespace WinFormsApp1
+﻿namespace WinFormsApp1
 {
     public partial class Form1 : Form
     {
@@ -11,12 +11,16 @@ namespace WinFormsApp1
 
         private Panel klavesnicaPanel;
         private Dictionary<char, Button> klavesnicaPismena;
-
+        private Dictionary<char, int> pismenaCount = new Dictionary<char, int>();
 
 
         public Form1()
         {
             InitializeComponent();
+            naplnSlovnik(slovo); //toto potom vymazat
+
+            this.KeyPreview = true;  
+            this.KeyDown += new KeyEventHandler(Form1_KeyDown);
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -43,9 +47,9 @@ namespace WinFormsApp1
             flp.Size = new Size(dlzkaSlova * 50 + dlzkaSlova * 10 + 50, pocetPokusov * 55 + 25);
             this.Controls.Add(flp);
 
-            InitializeScorePanel();
             InitializeKlavesnica();
-            this.Size = new Size(flp.Width + scorePanel.Width + 100, flp.Height + 120 + klavesnicaPanel.Height);
+            InitializeScorePanel();
+            this.Size = new Size(klavesnicaPanel.Width + scorePanel.Width + 100, flp.Height + 120 + klavesnicaPanel.Height);
 
             for (int j = 0; j < pocetPokusov; j++)
             {
@@ -115,6 +119,7 @@ namespace WinFormsApp1
                     {
                         textBox.BackColor = Color.Green;
                         textBox.ForeColor = Color.White;
+
                         klavesnicaPismena[textBox.Text[0]].BackColor = Color.Green;
                         klavesnicaPismena[textBox.Text[0]].ForeColor = Color.White;
                         UpdateScore(2);
@@ -125,9 +130,11 @@ namespace WinFormsApp1
                         allCorrect = false;
                         textBox.BackColor = Color.Gold;
                         textBox.ForeColor = Color.White;
-                        klavesnicaPismena[textBox.Text[0]].BackColor = Color.Gold;
-                        klavesnicaPismena[textBox.Text[0]].ForeColor = Color.White;
-
+                        if (klavesnicaPismena[textBox.Text[0]].BackColor != Color.Green)
+                        {
+                            klavesnicaPismena[textBox.Text[0]].BackColor = Color.Gold;
+                            klavesnicaPismena[textBox.Text[0]].ForeColor = Color.White;
+                        }
                     }
                     else
                     {
@@ -149,7 +156,7 @@ namespace WinFormsApp1
                 textBox.ReadOnly = false;
                 textBox.Focus();
             }
-            tlacitko.Enabled = true;
+            tlacitko.Enabled = false;
 
 
             if (allCorrect || (poradieSubmitTlacitka + 1 == (int)numericUpDown1.Value))
@@ -213,8 +220,8 @@ namespace WinFormsApp1
         private void InitializeScorePanel()
         {
             scorePanel = new Panel();
-            scorePanel.Location = new Point(flp.Right + 20, 30);
-            scorePanel.Size = new Size(180, flp.Height);
+            scorePanel.Location = new Point(klavesnicaPanel.Right + 20, 30);
+            scorePanel.Size = new Size(180, flp.Height + klavesnicaPanel.Height);
             scorePanel.BorderStyle = BorderStyle.FixedSingle;
 
             scoreLabel = new Label();
@@ -251,13 +258,14 @@ namespace WinFormsApp1
         {
             klavesnicaPanel = new Panel();
             klavesnicaPanel.Location = new Point(30, flp.Bottom + 20);
-            klavesnicaPanel.Size = new Size(500, 150);
+            klavesnicaPanel.Size = new Size(470, 150);
             this.Controls.Add(klavesnicaPanel);
 
             klavesnicaPismena = new Dictionary<char, Button>();
             string abeceda = "qwertyuiopasdfghjklzxcvbnm";
 
             int x = 10, y = 10;
+            int i = 1;
             foreach (char pismeno in abeceda)
             {
                 Button tlacitkoPismeno = new Button();
@@ -266,20 +274,82 @@ namespace WinFormsApp1
                 tlacitkoPismeno.Height = 40;
                 tlacitkoPismeno.Location = new Point(x, y);
                 tlacitkoPismeno.Font = new Font("Arial", 14, FontStyle.Bold);
-                klavesnicaPanel.Controls.Add(tlacitkoPismeno);
 
+                tlacitkoPismeno.Click += (s, e) => Klavesnica_Click(tlacitkoPismeno);
+
+                klavesnicaPanel.Controls.Add(tlacitkoPismeno);
                 klavesnicaPismena[pismeno] = tlacitkoPismeno;
 
                 x += 45;
                 if (x + 45 > klavesnicaPanel.Width)
                 {
-                    x = 10;
+                    x = 10 + i*20;
                     y += 45;
+                    i++;
+                }
+            }
+            Button backspaceTlacitko = new Button();
+
+            backspaceTlacitko.Text = "←";
+            backspaceTlacitko.ForeColor = Color.Black;
+            backspaceTlacitko.Location = new Point(x, y);
+            backspaceTlacitko.Height = 40;
+            backspaceTlacitko.Font = new Font("Arial", 14, FontStyle.Bold);
+            klavesnicaPanel.Controls.Add(backspaceTlacitko);
+
+            backspaceTlacitko.Click += new System.EventHandler(backSpace_click);
+
+        }
+
+        private void backSpace_click(object sender, EventArgs e)
+        {
+            for (int i = flp.Controls.Count - 1; i >= 0; i--)
+            {
+                if (flp.Controls[i] is TextBox textBox && textBox.ReadOnly == false)
+                {
+                    if (string.IsNullOrEmpty(textBox.Text) && i != 0)
+                    {
+                        textBox.ReadOnly = true;
+                        continue;
+                    }
+
+                    textBox.Text = string.Empty;
+                    textBox.Focus();
+                    break;
+                }
+            }
+            
+        }
+
+        private void Klavesnica_Click(Button clickedButton)
+        {
+            string pismeno = clickedButton.Text;
+
+            foreach (Control control in flp.Controls)
+            {
+                if (control is TextBox textBox && !textBox.ReadOnly && string.IsNullOrEmpty(textBox.Text))
+                {
+                    textBox.Text = pismeno;
+                    break;
                 }
             }
         }
 
-        
+        private void naplnSlovnik(string word)
+        {
+            foreach (char ch in word)
+            {
+                if (pismenaCount.ContainsKey(ch))
+                {
+                    pismenaCount[ch]++;
+                }
+                else
+                {
+                    pismenaCount.Add(ch, 1);
+                }
+            }
+        }
+
 
         private string getWord()
         {
@@ -296,7 +366,49 @@ namespace WinFormsApp1
             Random random = new Random();
 
             int indexOfRandomNumber = random.Next(1, words.Count);
-            return words[indexOfRandomNumber];
+            string word = words[indexOfRandomNumber];
+
+            naplnSlovnik(word);
+
+            return word;
         }
+
+
+        private void Form1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                foreach (Control control in flp.Controls)
+                {
+                    if (control is Button submitBtn && submitBtn.Enabled)
+                    {
+                        submitBtn.PerformClick();
+                        break;
+                    }
+                }
+
+                e.Handled = true;
+                e.SuppressKeyPress = true;
+            }
+            if (e.KeyCode == Keys.Back)
+            {
+                for (int i = flp.Controls.Count - 1; i >= 0; i--)
+                {
+                    if (flp.Controls[i] is TextBox textBox && textBox.ReadOnly == false)
+                    {
+                        if (string.IsNullOrEmpty(textBox.Text) && i != 0)
+                        {
+                            textBox.ReadOnly = true;
+                            continue;
+                        }
+
+                        textBox.Text = string.Empty;
+                        textBox.Focus();
+                        break;
+                    }
+                }
+            }
+        }
+
     }
 }
