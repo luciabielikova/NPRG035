@@ -154,7 +154,7 @@ namespace WinFormsApp1
             this.labelresponseinput.ForeColor = System.Drawing.Color.DarkSlateBlue;
             this.labelresponseinput.Location = new System.Drawing.Point(100, 212);
             this.labelresponseinput.Name = "labelresponseinput";
-            this.labelresponseinput.Size = new System.Drawing.Size(206, 24);
+            this.labelresponseinput.Size = new System.Drawing.Size(255, 24);
             this.labelresponseinput.TabIndex = 1;
             this.labelresponseinput.Text = "Number of Attempts:";
             // 
@@ -210,7 +210,7 @@ namespace WinFormsApp1
             this.label1.ForeColor = System.Drawing.Color.DarkSlateBlue;
             this.label1.Location = new System.Drawing.Point(100, 142);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(140, 24);
+            this.label1.Size = new System.Drawing.Size(189, 24);
             this.label1.TabIndex = 4;
             this.label1.Text = "Word Length:";
             // 
@@ -402,90 +402,117 @@ namespace WinFormsApp1
             }
         }
 
-
-
         /// <summary>
-        /// Initializes a flow layout panel containing text boxes for user input and submit buttons
-        /// for each attempt in the guessing game.
+        /// Creates the necessary layout, text boxes, and submit buttons for the word guessing game.
         /// </summary>
-        /// <param name="attempts">The number of attempts allowed for the player to guess the word.</param>
-        /// <param name="wordLength">The length of the word that the player is trying to guess.</param>
+        /// <param name="attempts">The number of attempts allowed for the player.</param>
+        /// <param name="wordLength">The length of the word to be guessed.</param>
         private void CreateTextBoxes(int attempts, int wordLength)
         {
-            // Initialize the flowLayoutPanel to hold text boxes and buttons for user input.
-            flowLayoutPanel = new FlowLayoutPanel
-            {
-                FlowDirection = FlowDirection.LeftToRight, // Arrange controls horizontally.
-                BorderStyle = BorderStyle.None, // No border for the panel.
-                Size = new Size((wordLength + 1) * (textBoxSize.Width + spaceBetweenTextBoxes.Width), // Calculate total width based on word length and spacing.
-                                (attempts + 1) * (textBoxSize.Height + spaceBetweenTextBoxes.Height)), // Calculate total height based on number of attempts and spacing.
-                Location = new Point(30, 30) // Position the panel within the form.
-            };
-            this.Controls.Add(flowLayoutPanel); // Add the flow layout panel to the form.
-
-            // Initialize the virtual keyboard for user input.
-            InitializeKeyboard();
-
-            // Adjust the layout of additional panels, if necessary.
-            PlacePanels();
-
-            // Initialize the score display panel.
-            InitializeScorePanel();
-
-            // Set the form size based on the largest panel (keyboard or flow layout) plus additional padding for score panel and layout.
-            this.Width = (keyboardPanel.Width > flowLayoutPanel.Width ? keyboardPanel.Width : flowLayoutPanel.Width) + 150 + scorePanel.Width;
-            this.Height = flowLayoutPanel.Height + 120 + keyboardPanel.Height; // Adjust height based on flow layout and keyboard.
-
-            // Create text boxes for each attempt.
+            InitializeLayout(wordLength, attempts);
             for (int j = 0; j < attempts; j++)
             {
-                // Loop to create text boxes for each character of the word in the current attempt.
-                for (int i = j * wordLength; i < j * wordLength + wordLength; i++)
+                CreateAttemptTextBoxes(j, wordLength);  // Create TextBoxes for this attempt
+                CreateSubmitButton(j);  // Create the submit button for this attempt
+            }
+
+            SetInitialFocus();  // Set focus on the first TextBox for user input
+        }
+
+        /// <summary>
+        /// Initializes the layout of the flow layout panel and other UI elements like the keyboard and score panel.
+        /// Sets the form size based on the largest panel.
+        /// </summary>
+        /// <param name="wordLength">The length of the word to be guessed.</param>
+        /// <param name="attempts">The number of attempts allowed for the player.</param>
+        private void InitializeLayout(int wordLength, int attempts)
+        {
+            // Initialize flowLayoutPanel
+            flowLayoutPanel = new FlowLayoutPanel
+            {
+                FlowDirection = FlowDirection.LeftToRight,
+                BorderStyle = BorderStyle.None,
+                Size = new Size((wordLength + 1) * (textBoxSize.Width + spaceBetweenTextBoxes.Width),
+                                (attempts + 1) * (textBoxSize.Height + spaceBetweenTextBoxes.Height)),
+                Location = new Point(30, 30)
+            };
+            this.Controls.Add(flowLayoutPanel);
+
+            InitializeKeyboard();  // Initialize the virtual keyboard panel
+            PlacePanels();         // Adjust and place other panels if needed
+            InitializeScorePanel(); // Initialize the score display panel
+
+            // Set form size based on the larger panel between keyboard and flow layout
+            this.Width = Math.Max(keyboardPanel.Width, flowLayoutPanel.Width) + 150 + scorePanel.Width;
+            this.Height = flowLayoutPanel.Height + 120 + keyboardPanel.Height;
+        }
+
+        /// <summary>
+        /// Creates a row of text boxes for a specific attempt.
+        /// Each text box is initialized with its properties such as size, font, and event handlers.
+        /// </summary>
+        /// <param name="attemptIndex">The index of the current attempt (row) being created.</param>
+        /// <param name="wordLength">The number of text boxes (word length) to be created for this attempt.</param>
+        private void CreateAttemptTextBoxes(int attemptIndex, int wordLength)
+        {
+            for (int i = attemptIndex * wordLength; i < attemptIndex * wordLength + wordLength; i++)
+            {
+                TextBox textBox = new TextBox
                 {
-                    TextBox textBox = new TextBox
-                    {
-                        Name = "textBox_" + i.ToString(), // Unique name for each text box based on its position.
-                        Size = textBoxSize, // Set size of the text box.
-                        BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle, // Single border style.
-                        MaxLength = 1, // Limit input to one character.
-                        Font = new Font("Comic Sans MS", 20, FontStyle.Bold), // Set font for the text box.
-                        TextAlign = HorizontalAlignment.Center // Center-align the text within the text box.
-                    };
-
-                    // Make all text boxes read-only except the first one in each row.
-                    if (i != 0)
-                    {
-                        textBox.ReadOnly = true; // Only the first text box in the row is editable.
-                    }
-
-                    // Attach an event handler to monitor text changes in the text box.
-                    textBox.TextChanged += new EventHandler(textBox_TextChanged);
-
-                    // Add the text box to the flow layout panel.
-                    flowLayoutPanel.Controls.Add(textBox);
-                }
-
-                // Create and configure the submit button for the current attempt.
-                Button submitButton = new Button
-                {
-                    Name = "submitBTN_" + j.ToString(), // Unique name for the submit button.
-                    Size = textBoxSize, // Set the size of the submit button.
-                    BackColor = Color.LightGreen, // Set the button's background color.
-                    Font = new Font("Comic Sans MS", 12, FontStyle.Bold), // Set font properties for the button.
-                    Text = "OK", // Button text.
-                    Enabled = false // Initially disabled until input is valid.
+                    Name = "textBox_" + i.ToString(),
+                    Size = textBoxSize,
+                    BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle,
+                    MaxLength = 1, // Single character input
+                    Font = new Font("Comic Sans MS", 20, FontStyle.Bold),
+                    TextAlign = HorizontalAlignment.Center
                 };
 
-                // Attach click event to handle submission of the text boxes when the button is clicked.
-                submitButton.Click += new System.EventHandler(submitButton_Click);
+                // Make all text boxes read-only except the first one in the first row
+                if (i != 0)
+                {
+                    textBox.ReadOnly = true;
+                }
 
-                // Add the submit button to the flow layout panel.
-                flowLayoutPanel.Controls.Add(submitButton);
+                // Attach event handler for when the text changes in the box
+                textBox.TextChanged += new EventHandler(textBox_TextChanged);
 
-                // Set focus to the first text box to allow immediate input from the user.
-                flowLayoutPanel.Controls["textBox_0"].Focus();
+                // Add the text box to the panel
+                flowLayoutPanel.Controls.Add(textBox);
             }
         }
+
+        /// <summary>
+        /// Creates a submit button for a specific attempt, setting its properties such as size, color, and event handler.
+        /// </summary>
+        /// <param name="attemptIndex">The index of the current attempt (row) being created.</param>
+        private void CreateSubmitButton(int attemptIndex)
+        {
+            Button submitButton = new Button
+            {
+                Name = "submitBTN_" + attemptIndex.ToString(),
+                Size = textBoxSize,
+                BackColor = Color.LightGreen,
+                Font = new Font("Comic Sans MS", 12, FontStyle.Bold),
+                Text = "OK",
+                Enabled = false // Button is disabled initially until text input is valid
+            };
+
+            // Attach click event to handle submission logic
+            submitButton.Click += new System.EventHandler(submitButton_Click);
+
+            // Add the submit button to the flow layout panel
+            flowLayoutPanel.Controls.Add(submitButton);
+        }
+
+        /// <summary>
+        /// Sets the initial focus on the first text box in the flow layout for immediate user input.
+        /// </summary>
+        private void SetInitialFocus()
+        {
+            // Set focus on the first text box to allow immediate input from the user
+            flowLayoutPanel.Controls["textBox_0"].Focus();
+        }
+
 
         /// <summary>
         /// Initiates the game by hiding the game settings input controls and creating 
@@ -508,157 +535,180 @@ namespace WinFormsApp1
 
 
         /// <summary>
-        /// Handles the click event for the submit button. This method processes the user's input,
-        /// checks each letter against the target word, and updates the UI accordingly.
-        /// 
-        /// Steps:
-        /// 1. Retrieves the index of the button that was clicked to determine which attempt is being made.
-        /// 2. Iterates through the corresponding text boxes to compare user input with the target word.
-        /// 3. Checks if the word from user is valid.
-        /// 4. Updates the text box colors based on the correctness of each letter:
-        ///    - Green for correct letters in the right position.
-        ///    - Gold for letters that are correct but in the wrong position.
-        ///    - Gray for incorrect letters not in the word.
-        /// 5. Updates the keyboard button colors to reflect the same status as the text boxes.
-        /// 6. Keeps track of the overall correctness of the guess using the `allCorrect` flag.
-        /// 7. If the guess is correct, prompts the user to play again; if all attempts are used, shows a different message.
-        /// 8. Resets the game state if the user chooses to play again, or exits the application if they decline.
+        /// Handles the click event for the submit button.
+        /// Extracts the word from the TextBoxes, validates it, processes the submission, and checks if the game has ended.
         /// </summary>
-        /// <param name="sender">The object that triggered the event.</param>
-        /// <param name="e">The event data.</param>
+        /// <param name="sender">The button that triggered the event.</param>
+        /// <param name="e">Event arguments.</param>
         private void submitButton_Click(object sender, EventArgs e)
         {
-            // Cast the sender to a Button to access its properties.
             Button button = sender as Button;
-
-            // Extract the index from the button's name to determine which submission set it corresponds to.
             int submitButtonIndex = int.Parse(button.Name[10..]);
-            int wordLength = NumberOfWordLetters; // The length of the target word.
-            bool allCorrect = true; // Flag to track if all letters were guessed correctly.
-            string wordToCheck = "";
+            string wordToCheck = ExtractWord(submitButtonIndex);
 
-            for (int i = submitButtonIndex * wordLength; i < (submitButtonIndex + 1) * wordLength; i++)
+            if (IsValidWord(wordToCheck))
             {
-                TextBox textBox = flowLayoutPanel.Controls["textBox_" + i.ToString()] as TextBox;
-                wordToCheck += textBox.Text[0];
-            }
-            if (checkValidWord(wordToCheck))
-            {
-                // Iterate through the TextBoxes corresponding to the current submission.
-                for (int i = submitButtonIndex * wordLength; i < (submitButtonIndex + 1) * wordLength; i++)
-                {
-                    // Find the TextBox for the current index.
-                    TextBox textBox = flowLayoutPanel.Controls["textBox_" + i.ToString()] as TextBox;
-
-                    if (textBox != null)
-                    {
-                        // Check if the player's input matches the corresponding character in the word.
-                        if (textBox.Text[0] == word[i % wordLength])
-                        {
-                            // Correct guess: Update the TextBox appearance to indicate success.
-                            textBox.BackColor = Color.Green;
-                            textBox.ForeColor = Color.White;
-
-                            // Update the corresponding keyboard button to reflect the correct guess.
-                            keyboardButtons[textBox.Text[0]].BackColor = Color.Green;
-                            keyboardButtons[textBox.Text[0]].ForeColor = Color.White;
-
-                            // Update the player's score positively.
-                            UpdateScore(2);
-                        }
-                        // Check if the guessed letter is in the word but not in the correct position.
-                        else if (word.Contains(textBox.Text[0]))
-                        {
-                            allCorrect = false; // Set flag to false since not all letters are correct.
-                            textBox.BackColor = Color.Gold; // Indicate a correct letter in the wrong position.
-                            textBox.ForeColor = Color.White;
-
-                            // Update the keyboard button to reflect the presence of the letter.
-                            if (keyboardButtons[textBox.Text[0]].BackColor != Color.Green)
-                            {
-                                keyboardButtons[textBox.Text[0]].BackColor = Color.Gold;
-                                keyboardButtons[textBox.Text[0]].ForeColor = Color.White;
-                            }
-                        }
-                        // Incorrect guess: Update the TextBox and keyboard button to indicate failure.
-                        else
-                        {
-                            allCorrect = false; // Not all letters are correct.
-                            textBox.BackColor = Color.Gray; // Mark as incorrect.
-                            textBox.ForeColor = Color.White;
-
-                            keyboardButtons[textBox.Text[0]].BackColor = Color.Gray; // Update keyboard button.
-                            keyboardButtons[textBox.Text[0]].ForeColor = Color.White;
-
-                            // Deduct points from the player's score.
-                            UpdateScore(-3);
-                        }
-                        // Set the TextBox to read-only to prevent further editing.
-                        textBox.ReadOnly = true;
-                    }
-                }
+                HandleSubmitAttempt(submitButtonIndex, wordToCheck, button);
             }
             else
             {
                 cheekyLabel.Text = "That word is a little questionable. How about giving it another shot with a valid one?";
                 return;
             }
-            // Enable the next TextBox for user input if there are attempts remaining.
+
+            CheckGameEnd(submitButtonIndex, button);
+        }
+
+        /// <summary>
+        /// Extracts the word guessed by the player based on the current submission index.
+        /// </summary>
+        /// <param name="submitButtonIndex">The index of the submit button pressed, determining which word to extract.</param>
+        /// <returns>The guessed word as a string.</returns>
+        private string ExtractWord(int submitButtonIndex)
+        {
+            string wordToCheck = "";
+            for (int i = submitButtonIndex * NumberOfWordLetters; i < (submitButtonIndex + 1) * NumberOfWordLetters; i++)
+            {
+                TextBox textBox = flowLayoutPanel.Controls["textBox_" + i.ToString()] as TextBox;
+                wordToCheck += textBox.Text[0];
+            }
+            return wordToCheck;
+        }
+
+        /// <summary>
+        /// Validates if the word entered by the player is part of the game's accepted word list.
+        /// </summary>
+        /// <param name="wordToCheck">The word to validate.</param>
+        /// <returns>True if the word is valid, otherwise false.</returns>
+        private bool IsValidWord(string wordToCheck)
+        {
+            return checkValidWord(wordToCheck);
+        }
+
+        /// <summary>
+        /// Handles the logic for processing the player's submission, including updating TextBox colors,
+        /// keyboard button states, and adjusting the score. It also sets the next TextBox active, if applicable.
+        /// </summary>
+        /// <param name="submitButtonIndex">The index of the submission being processed.</param>
+        /// <param name="wordToCheck">The word guessed by the player.</param>
+        /// <param name="button">The submit button that was clicked.</param>
+        private void HandleSubmitAttempt(int submitButtonIndex, string wordToCheck, Button button)
+        {
+            bool allCorrect = true;
+
+            for (int i = submitButtonIndex * NumberOfWordLetters; i < (submitButtonIndex + 1) * NumberOfWordLetters; i++)
+            {
+                TextBox textBox = flowLayoutPanel.Controls["textBox_" + i.ToString()] as TextBox;
+                if (textBox != null)
+                {
+                    UpdateTextBoxAppearance(textBox, i, ref allCorrect);
+                }
+            }
+
             if (submitButtonIndex + 1 != NumberOfAttempts)
             {
-                TextBox textBox = flowLayoutPanel.Controls["textBox_" + ((submitButtonIndex + 1) * wordLength).ToString()] as TextBox;
-                textBox.ReadOnly = false; // Make the next TextBox editable.
-                textBox.Focus(); // Move focus to the next TextBox.
+                TextBox nextTextBox = flowLayoutPanel.Controls["textBox_" + ((submitButtonIndex + 1) * NumberOfWordLetters).ToString()] as TextBox;
+                nextTextBox.ReadOnly = false;
+                nextTextBox.Focus();
             }
 
-            // Disable the current submit button to prevent repeated submissions.
             button.Enabled = false;
 
-            // Check if all letters were guessed correctly.
             if (allCorrect)
             {
-                // If all guesses are correct, prompt the user to play again.
-                DialogResult result = MessageBox.Show("Play again?", "The End", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                SaveHighScore(score); // Save the current score if it's a new high score.
-
-                // Restart the game or exit based on user response.
-                if (result == DialogResult.Yes)
-                {
-                    RestartGame();
-                }
-                else
-                {
-                    Application.Exit(); // Exit the application if user chooses not to play again.
-                }
+                ShowPlayAgainDialog(true);
             }
-            // If this was the last attempt, inform the player and prompt to play again.
-            else if (submitButtonIndex + 1 == NumberOfAttempts)
+        }
+
+        /// <summary>
+        /// Updates the appearance of the TextBox and the corresponding keyboard button based on the player's guess.
+        /// Changes the background color of the TextBox and keyboard button based on whether the guess was correct, partially correct, or incorrect.
+        /// Also updates the player's score accordingly.
+        /// </summary>
+        /// <param name="textBox">The TextBox being updated.</param>
+        /// <param name="index">The current index of the letter being evaluated in the word.</param>
+        /// <param name="allCorrect">Reference to a boolean flag indicating if all guesses so far are correct.</param>
+        private void UpdateTextBoxAppearance(TextBox textBox, int index, ref bool allCorrect)
+        {
+            char guessedLetter = textBox.Text[0];
+            if (guessedLetter == word[index % NumberOfWordLetters])
             {
-                if (!allCorrect)
+                textBox.BackColor = Color.Green;
+                textBox.ForeColor = Color.White;
+                keyboardButtons[guessedLetter].BackColor = Color.Green;
+                keyboardButtons[guessedLetter].ForeColor = Color.White;
+                UpdateScore(2);
+            }
+            else if (word.Contains(guessedLetter))
+            {
+                allCorrect = false;
+                textBox.BackColor = Color.Gold;
+                textBox.ForeColor = Color.White;
+                if (keyboardButtons[guessedLetter].BackColor != Color.Green)
                 {
-                    cheekyLabel.Text = "Better luck next time!"; // Provide feedback on failure.
-                }
-
-                // Ask the user if they want to play again.
-                DialogResult result = MessageBox.Show("Play again?", "The End", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-
-                // Restart or exit based on user choice.
-                if (result == DialogResult.Yes)
-                {
-                    RestartGame();
-                }
-                else
-                {
-                    Application.Exit();
+                    keyboardButtons[guessedLetter].BackColor = Color.Gold;
+                    keyboardButtons[guessedLetter].ForeColor = Color.White;
                 }
             }
-            // Provide a random cheeky label if the game is still ongoing and not all guesses are correct.
             else
             {
-                Random random = new Random();
-                cheekyLabel.Text = cheekyLabels[random.Next(0, cheekyLabels.Length)];
-
+                allCorrect = false;
+                textBox.BackColor = Color.Gray;
+                textBox.ForeColor = Color.White;
+                keyboardButtons[guessedLetter].BackColor = Color.Gray;
+                keyboardButtons[guessedLetter].ForeColor = Color.White;
+                UpdateScore(-3);
             }
+
+            textBox.ReadOnly = true;
+        }
+
+        /// <summary>
+        /// Checks if the game has ended, either because the player guessed the word correctly or because all attempts have been used.
+        /// If the game is still ongoing, it provides feedback to the player.
+        /// </summary>
+        /// <param name="submitButtonIndex">The index of the current submission attempt.</param>
+        /// <param name="button">The submit button that was clicked.</param>
+        private void CheckGameEnd(int submitButtonIndex, Button button)
+        {
+            if (submitButtonIndex + 1 == NumberOfAttempts)
+            {
+                cheekyLabel.Text = "Better luck next time!";
+                ShowPlayAgainDialog(false);
+            }
+            else
+            {
+                ProvideCheekyFeedback();
+            }
+        }
+
+        /// <summary>
+        /// Displays a dialog box prompting the player to either play again or exit the game.
+        /// If the player chooses to play again, the game restarts. Otherwise, the application exits.
+        /// </summary>
+        /// <param name="isWin">Boolean flag indicating whether the player has won or lost the game.</param>
+        private void ShowPlayAgainDialog(bool isWin)
+        {
+            DialogResult result = MessageBox.Show(isWin ? "Play again?" : "Try again?", "The End", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            SaveHighScore(score);
+
+            if (result == DialogResult.Yes)
+            {
+                RestartGame();
+            }
+            else
+            {
+                Application.Exit();
+            }
+        }
+
+        /// <summary>
+        /// Provides the player with a random "cheeky" feedback message from the `cheekyLabels` array.
+        /// </summary>
+        private void ProvideCheekyFeedback()
+        {
+            Random random = new Random();
+            cheekyLabel.Text = cheekyLabels[random.Next(0, cheekyLabels.Length)];
         }
 
         /// <summary>
