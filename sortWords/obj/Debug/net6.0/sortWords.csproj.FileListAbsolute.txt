@@ -1,0 +1,15 @@
+C:\Moje dokumenty\ZS\csharp\sortWords\bin\Debug\net6.0\sortWords.exe
+C:\Moje dokumenty\ZS\csharp\sortWords\bin\Debug\net6.0\sortWords.deps.json
+C:\Moje dokumenty\ZS\csharp\sortWords\bin\Debug\net6.0\sortWords.runtimeconfig.json
+C:\Moje dokumenty\ZS\csharp\sortWords\bin\Debug\net6.0\sortWords.dll
+C:\Moje dokumenty\ZS\csharp\sortWords\bin\Debug\net6.0\sortWords.pdb
+C:\Moje dokumenty\ZS\csharp\sortWords\obj\Debug\net6.0\sortWords.csproj.AssemblyReference.cache
+C:\Moje dokumenty\ZS\csharp\sortWords\obj\Debug\net6.0\sortWords.GeneratedMSBuildEditorConfig.editorconfig
+C:\Moje dokumenty\ZS\csharp\sortWords\obj\Debug\net6.0\sortWords.AssemblyInfoInputs.cache
+C:\Moje dokumenty\ZS\csharp\sortWords\obj\Debug\net6.0\sortWords.AssemblyInfo.cs
+C:\Moje dokumenty\ZS\csharp\sortWords\obj\Debug\net6.0\sortWords.csproj.CoreCompileInputs.cache
+C:\Moje dokumenty\ZS\csharp\sortWords\obj\Debug\net6.0\sortWords.dll
+C:\Moje dokumenty\ZS\csharp\sortWords\obj\Debug\net6.0\refint\sortWords.dll
+C:\Moje dokumenty\ZS\csharp\sortWords\obj\Debug\net6.0\sortWords.pdb
+C:\Moje dokumenty\ZS\csharp\sortWords\obj\Debug\net6.0\sortWords.genruntimeconfig.cache
+C:\Moje dokumenty\ZS\csharp\sortWords\obj\Debug\net6.0\ref\sortWords.dll
