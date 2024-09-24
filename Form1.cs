@@ -1,12 +1,17 @@
-﻿﻿namespace WinFormsApp1
-{
-    //todo vizual aj uvodnej stranky,dat kod z designera sem, potencialne nejaka animacia
+﻿//Wordle
+//Lucia Bieliková, 3. ročník
+//zimný semester 2023
+//Programování v jazyku C#, NPRG035
 
 
-public partial class Form1 : Form
+using System.Drawing.Drawing2D;
+
+namespace WinFormsApp1
 {
+    public partial class Form1 : Form
+    {
         // The word to be guessed in the game
-        string word = "kitty";
+        string word = "";
 
         // A string containing all alphabet letters for use in the virtual keyboard
         private string alphabet = "qwertyuiopasdfghjklzxcvbnm";
@@ -45,7 +50,7 @@ public partial class Form1 : Form
         private Size textBoxSize = new Size(50, 50);
 
         // Size of the buttons in the virtual keyboard
-        private Size buttonSize = new Size(40, 40);
+        private Size buttonSize = new Size(45, 45);
 
         // The space between text boxes in the flow layout
         private Size spaceBetweenTextBoxes = new Size(8, 5);
@@ -64,7 +69,8 @@ public partial class Form1 : Form
         private string[] cheekyLabels = {
             "Close, but no cigar!",
             "Not everyone can be a winner... but still.",
-            "Well, somebody had to lose!","It’s not the end of the world... just your streak.",
+            "Well, somebody had to lose!",
+            "It’s not the end of the world... just your streak.",
             "A+ for effort! Just kidding, it's a solid D.",
             "Winning isn’t everything. But it’s better than this.",
             "Good news: you're consistent! Bad news: at losing.",
@@ -115,16 +121,132 @@ public partial class Form1 : Form
             // Initializes the form's components (UI elements, settings, etc.)
             InitializeComponent();
 
-            // Set the default number of letters in a word based on the numericUpDown2 control's current value.
-            NumberOfWordLetters = (int)numericUpDown2.Value;
+            // Set the default number of letters in a word based on the wordLen control's current value.
+            NumberOfWordLetters = (int)wordLen.Value;
 
-            // Set the default number of attempts based on the numericUpDown1 control's current value.
-            NumberOfAttempts = (int)numericUpDown1.Value;
+            // Set the default number of attempts based on the attemptsNr control's current value.
+            NumberOfAttempts = (int)attemptsNr.Value;
 
             // Populate the letter count dictionary with the word from the game.
             // This line will be removed later; it is here for initial testing or setup purposes.
             FillDictionary(word); // This will be removed later
         }
+
+        /// <summary>
+        /// Initializes the components for the form.
+        /// This method manually creates all the controls for the form, sets their properties, and adds them to the form.
+        /// It includes input fields for the number of tries and the length of the word, a button to start the game, and their respective labels.
+        /// </summary>
+        private void InitializeComponent()
+        {
+            this.labelresponseinput = new System.Windows.Forms.Label();
+            this.attemptsNr = new System.Windows.Forms.NumericUpDown();
+            this.wordLen = new System.Windows.Forms.NumericUpDown();
+            this.label1 = new System.Windows.Forms.Label();
+            this.startButton = new System.Windows.Forms.Button();
+            ((System.ComponentModel.ISupportInitialize)(this.attemptsNr)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.wordLen)).BeginInit();
+            this.SuspendLayout();
+            // 
+            // labelresponseinput
+            // 
+            this.labelresponseinput.Font = new System.Drawing.Font("Comic Sans MS", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.labelresponseinput.ForeColor = System.Drawing.Color.DarkSlateBlue;
+            this.labelresponseinput.Location = new System.Drawing.Point(100, 212);
+            this.labelresponseinput.Name = "labelresponseinput";
+            this.labelresponseinput.Size = new System.Drawing.Size(206, 24);
+            this.labelresponseinput.TabIndex = 1;
+            this.labelresponseinput.Text = "Number of Attempts:";
+            // 
+            // attemptsNr
+            // 
+            this.attemptsNr.Location = new System.Drawing.Point(412, 212);
+            this.attemptsNr.Maximum = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.attemptsNr.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.attemptsNr.Name = "attemptsNr";
+            this.attemptsNr.Size = new System.Drawing.Size(83, 27);
+            this.attemptsNr.TabIndex = 2;
+            this.attemptsNr.Value = new decimal(new int[] {
+            6,
+            0,
+            0,
+            0});
+            this.attemptsNr.ValueChanged += new System.EventHandler(this.attemptsNr_ValueChanged);
+            // 
+            // wordLen
+            // 
+            this.wordLen.Location = new System.Drawing.Point(412, 143);
+            this.wordLen.Maximum = new decimal(new int[] {
+            15,
+            0,
+            0,
+            0});
+            this.wordLen.Minimum = new decimal(new int[] {
+            3,
+            0,
+            0,
+            0});
+            this.wordLen.Name = "wordLen";
+            this.wordLen.Size = new System.Drawing.Size(83, 27);
+            this.wordLen.TabIndex = 3;
+            this.wordLen.Value = new decimal(new int[] {
+            5,
+            0,
+            0,
+            0});
+            this.wordLen.ValueChanged += new System.EventHandler(this.wordLen_ValueChanged);
+            // 
+            // label1
+            // 
+            this.label1.Font = new System.Drawing.Font("Comic Sans MS", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.label1.ForeColor = System.Drawing.Color.DarkSlateBlue;
+            this.label1.Location = new System.Drawing.Point(100, 142);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(140, 24);
+            this.label1.TabIndex = 4;
+            this.label1.Text = "Word Length:";
+            // 
+            // startButton
+            // 
+            this.startButton.Location = new System.Drawing.Point(280, 320);
+            this.startButton.Name = "startButton";
+            this.startButton.Size = new System.Drawing.Size(160, 45);
+            this.startButton.TabIndex = 5;
+            this.startButton.Text = "Start Game!";
+            this.startButton.UseVisualStyleBackColor = true;
+            this.startButton.Click += new System.EventHandler(this.startGame);
+            // 
+            // Form1
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(229)))), ((int)(((byte)(205)))), ((int)(((byte)(235)))));
+            this.ClientSize = new System.Drawing.Size(688, 484);
+            this.Controls.Add(this.startButton);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.wordLen);
+            this.Controls.Add(this.attemptsNr);
+            this.Controls.Add(this.labelresponseinput);
+            this.Name = "Form1";
+            this.Text = "Wordle";
+            this.Load += new System.EventHandler(this.Form1_Load);
+            ((System.ComponentModel.ISupportInitialize)(this.attemptsNr)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.wordLen)).EndInit();
+            this.ResumeLayout(false);
+
+        }
+
+
+
+
 
         /// <summary>
         /// Event handler for the Load event of the Form1.
@@ -138,33 +260,120 @@ public partial class Form1 : Form
         {
             // Load the highest score from the persistent storage when the form loads.
             LoadHighScore();
+            CustomizeStartButton();
+            CustomizeLabels();
+            CustomizeControls();
+
+        }
+
+        /// <summary>
+        /// Customizes the appearance of a NumericUpDown control.
+        /// </summary>
+        /// <param name="numericUpDown">The NumericUpDown control to customize.</param>
+        private void CustomizeNumericUpDown(NumericUpDown numericUpDown)
+        {
+            // Set background color for a soft and pleasant appearance
+            numericUpDown.BackColor = Color.FromArgb(198, 225, 233);
+            // Set font style and size for a cute, friendly look
+            numericUpDown.Font = new Font("Comic Sans MS", 23, FontStyle.Bold);
+            numericUpDown.ForeColor = Color.White; // Set text color to white for contrast
+
+            // Remove the default border style for a more modern look
+            numericUpDown.BorderStyle = BorderStyle.None;
+            numericUpDown.Size = new Size(140, 100); // Set size for better user interaction
+        }
+
+        /// <summary>
+        /// Customizes the appearance of the start button.
+        /// </summary>
+        private void CustomizeStartButton()
+        {
+            // Set the button text with a cute emoji to enhance visual appeal
+            this.startButton.Text = "💖 Start";
+            // Set a light pink background color for the button
+            this.startButton.BackColor = Color.FromArgb(255, 182, 193);
+            this.startButton.Font = new Font("Comic Sans MS", 14, FontStyle.Bold); // Use a playful font
+            this.startButton.ForeColor = Color.White; // Set white text for contrast
+
+            // Create rounded corners for the button using a custom region
+            GraphicsPath buttonPath = new GraphicsPath();
+            buttonPath.AddArc(0, 0, 20, 20, 180, 90); // Top-left corner
+            buttonPath.AddArc(this.startButton.Width - 20, 0, 20, 20, 270, 90); // Top-right corner
+            buttonPath.AddArc(this.startButton.Width - 20, this.startButton.Height - 20, 20, 20, 0, 90); // Bottom-right corner
+            buttonPath.AddArc(0, this.startButton.Height - 20, 20, 20, 90, 90); // Bottom-left corner
+            buttonPath.CloseFigure(); // Close the path to form a complete shape
+            this.startButton.Region = new Region(buttonPath); // Apply the rounded region to the button
+
+            // Add hover effect for better user interaction
+            this.startButton.MouseEnter += (s, e) =>
+            {
+                this.startButton.BackColor = Color.FromArgb(255, 105, 180); // Change to hot pink on hover
+            };
+
+            this.startButton.MouseLeave += (s, e) =>
+            {
+                this.startButton.BackColor = Color.FromArgb(255, 182, 193); // Return to light pink when not hovered
+            };
+        }
+
+        /// <summary>
+        /// Customizes the appearance of a Label control.
+        /// </summary>
+        /// <param name="label">The Label control to customize.</param>
+        private void CustomizeLabel(Label label)
+        {
+            // Automatically adjust the size of the label based on its content
+            label.AutoSize = true;
+            label.Font = new Font("Comic Sans MS", 16, FontStyle.Bold); // Use a playful font
+            label.ForeColor = Color.White; // Set text color to white for good contrast
+            label.Padding = new Padding(10); // Add padding for a softer appearance
+            label.BorderStyle = BorderStyle.None; // Use no border for a clean look
+            label.FlatStyle = FlatStyle.Flat; // Set flat style for a modern appearance
+        }
+
+        /// <summary>
+        /// Customizes all the necessary controls for the application.
+        /// </summary>
+        private void CustomizeControls()
+        {
+            CustomizeNumericUpDown(attemptsNr); // Customize the attempts number input
+            CustomizeNumericUpDown(wordLen); // Customize the word length input
+        }
+
+        /// <summary>
+        /// Customizes the labels used in the application.
+        /// </summary>
+        private void CustomizeLabels()
+        {
+            CustomizeLabel(labelresponseinput); // Customize the label for the number of attempts
+            CustomizeLabel(label1); // Customize the label for the word length
         }
 
 
         /// <summary>
-        /// Event handler for the ValueChanged event of numericUpDown2.
+        /// Event handler for the ValueChanged event of wordLen.
         /// Updates the NumberOfWordLetters variable based on the selected value from the numeric up-down control.
         /// This determines the length of the word to be guessed in the game.
         /// </summary>
         /// <param name="sender">The source of the event, typically the numericUpDown control.</param>
         /// <param name="e">Event arguments that contain the event data.</param>
-        private void numericUpDown2_ValueChanged(object sender, EventArgs e)
+        private void wordLen_ValueChanged(object sender, EventArgs e)
         {
-            // Update the NumberOfWordLetters to the currently selected value in numericUpDown2.
-            NumberOfWordLetters = (int)numericUpDown2.Value;
+            // Update the NumberOfWordLetters to the currently selected value in wordLen.
+            NumberOfWordLetters = (int)wordLen.Value;
         }
 
         /// <summary>
-        /// Event handler for the ValueChanged event of numericUpDown1.
+        /// Event handler for the ValueChanged event of attemptsNr.
         /// Updates the NumberOfAttempts variable based on the selected value from the numeric up-down control.
         /// This determines how many attempts the player has to guess the word in the game.
         /// </summary>
         /// <param name="sender">The source of the event, typically the numericUpDown control.</param>
         /// <param name="e">Event arguments that contain the event data.</param>
-        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
+        private void attemptsNr_ValueChanged(object sender, EventArgs e)
         {
-            // Update the NumberOfAttempts to the currently selected value in numericUpDown1.
-            NumberOfAttempts = (int)numericUpDown1.Value;
+            // Update the NumberOfAttempts to the currently selected value in attemptsNr.
+            NumberOfAttempts = (int)attemptsNr.Value;
         }
 
 
@@ -239,7 +448,7 @@ public partial class Form1 : Form
                         Size = textBoxSize, // Set size of the text box.
                         BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle, // Single border style.
                         MaxLength = 1, // Limit input to one character.
-                        Font = new Font("Arial", 20, FontStyle.Bold), // Set font for the text box.
+                        Font = new Font("Comic Sans MS", 20, FontStyle.Bold), // Set font for the text box.
                         TextAlign = HorizontalAlignment.Center // Center-align the text within the text box.
                     };
 
@@ -262,7 +471,7 @@ public partial class Form1 : Form
                     Name = "submitBTN_" + j.ToString(), // Unique name for the submit button.
                     Size = textBoxSize, // Set the size of the submit button.
                     BackColor = Color.LightGreen, // Set the button's background color.
-                    Font = new Font("Arial", 12, FontStyle.Bold), // Set font properties for the button.
+                    Font = new Font("Comic Sans MS", 12, FontStyle.Bold), // Set font properties for the button.
                     Text = "OK", // Button text.
                     Enabled = false // Initially disabled until input is valid.
                 };
@@ -287,11 +496,12 @@ public partial class Form1 : Form
         private void startGame(object sender, EventArgs e)
         {
             // Hide the input controls for game settings.
-            numericUpDown1.Visible = false;
-            numericUpDown2.Visible = false;
+            word = GetWord();
+            attemptsNr.Visible = false;
+            wordLen.Visible = false;
             label1.Visible = false;
             labelresponseinput.Visible = false;
-            button1.Visible = false;
+            startButton.Visible = false;
             CreateTextBoxes(NumberOfAttempts, NumberOfWordLetters); // Create input fields for the game.
         }
 
@@ -304,14 +514,15 @@ public partial class Form1 : Form
         /// Steps:
         /// 1. Retrieves the index of the button that was clicked to determine which attempt is being made.
         /// 2. Iterates through the corresponding text boxes to compare user input with the target word.
-        /// 3. Updates the text box colors based on the correctness of each letter:
+        /// 3. Checks if the word from user is valid.
+        /// 4. Updates the text box colors based on the correctness of each letter:
         ///    - Green for correct letters in the right position.
         ///    - Gold for letters that are correct but in the wrong position.
         ///    - Gray for incorrect letters not in the word.
-        /// 4. Updates the keyboard button colors to reflect the same status as the text boxes.
-        /// 5. Keeps track of the overall correctness of the guess using the `allCorrect` flag.
-        /// 6. If the guess is correct, prompts the user to play again; if all attempts are used, shows a different message.
-        /// 7. Resets the game state if the user chooses to play again, or exits the application if they decline.
+        /// 5. Updates the keyboard button colors to reflect the same status as the text boxes.
+        /// 6. Keeps track of the overall correctness of the guess using the `allCorrect` flag.
+        /// 7. If the guess is correct, prompts the user to play again; if all attempts are used, shows a different message.
+        /// 8. Resets the game state if the user chooses to play again, or exits the application if they decline.
         /// </summary>
         /// <param name="sender">The object that triggered the event.</param>
         /// <param name="e">The event data.</param>
@@ -324,61 +535,74 @@ public partial class Form1 : Form
             int submitButtonIndex = int.Parse(button.Name[10..]);
             int wordLength = NumberOfWordLetters; // The length of the target word.
             bool allCorrect = true; // Flag to track if all letters were guessed correctly.
+            string wordToCheck = "";
 
-            // Iterate through the TextBoxes corresponding to the current submission.
             for (int i = submitButtonIndex * wordLength; i < (submitButtonIndex + 1) * wordLength; i++)
             {
-                // Find the TextBox for the current index.
                 TextBox textBox = flowLayoutPanel.Controls["textBox_" + i.ToString()] as TextBox;
-
-                if (textBox != null)
+                wordToCheck += textBox.Text[0];
+            }
+            if (checkValidWord(wordToCheck))
+            {
+                // Iterate through the TextBoxes corresponding to the current submission.
+                for (int i = submitButtonIndex * wordLength; i < (submitButtonIndex + 1) * wordLength; i++)
                 {
-                    // Check if the player's input matches the corresponding character in the word.
-                    if (textBox.Text[0] == word[i % wordLength])
+                    // Find the TextBox for the current index.
+                    TextBox textBox = flowLayoutPanel.Controls["textBox_" + i.ToString()] as TextBox;
+
+                    if (textBox != null)
                     {
-                        // Correct guess: Update the TextBox appearance to indicate success.
-                        textBox.BackColor = Color.Green;
-                        textBox.ForeColor = Color.White;
-
-                        // Update the corresponding keyboard button to reflect the correct guess.
-                        keyboardButtons[textBox.Text[0]].BackColor = Color.Green;
-                        keyboardButtons[textBox.Text[0]].ForeColor = Color.White;
-
-                        // Update the player's score positively.
-                        UpdateScore(2);
-                    }
-                    // Check if the guessed letter is in the word but not in the correct position.
-                    else if (word.Contains(textBox.Text[0]))
-                    {
-                        allCorrect = false; // Set flag to false since not all letters are correct.
-                        textBox.BackColor = Color.Gold; // Indicate a correct letter in the wrong position.
-                        textBox.ForeColor = Color.White;
-
-                        // Update the keyboard button to reflect the presence of the letter.
-                        if (keyboardButtons[textBox.Text[0]].BackColor != Color.Green)
+                        // Check if the player's input matches the corresponding character in the word.
+                        if (textBox.Text[0] == word[i % wordLength])
                         {
-                            keyboardButtons[textBox.Text[0]].BackColor = Color.Gold;
+                            // Correct guess: Update the TextBox appearance to indicate success.
+                            textBox.BackColor = Color.Green;
+                            textBox.ForeColor = Color.White;
+
+                            // Update the corresponding keyboard button to reflect the correct guess.
+                            keyboardButtons[textBox.Text[0]].BackColor = Color.Green;
                             keyboardButtons[textBox.Text[0]].ForeColor = Color.White;
+
+                            // Update the player's score positively.
+                            UpdateScore(2);
                         }
-                    }
-                    // Incorrect guess: Update the TextBox and keyboard button to indicate failure.
-                    else
-                    {
-                        allCorrect = false; // Not all letters are correct.
-                        textBox.BackColor = Color.Gray; // Mark as incorrect.
-                        textBox.ForeColor = Color.White;
+                        // Check if the guessed letter is in the word but not in the correct position.
+                        else if (word.Contains(textBox.Text[0]))
+                        {
+                            allCorrect = false; // Set flag to false since not all letters are correct.
+                            textBox.BackColor = Color.Gold; // Indicate a correct letter in the wrong position.
+                            textBox.ForeColor = Color.White;
 
-                        keyboardButtons[textBox.Text[0]].BackColor = Color.Gray; // Update keyboard button.
-                        keyboardButtons[textBox.Text[0]].ForeColor = Color.White;
+                            // Update the keyboard button to reflect the presence of the letter.
+                            if (keyboardButtons[textBox.Text[0]].BackColor != Color.Green)
+                            {
+                                keyboardButtons[textBox.Text[0]].BackColor = Color.Gold;
+                                keyboardButtons[textBox.Text[0]].ForeColor = Color.White;
+                            }
+                        }
+                        // Incorrect guess: Update the TextBox and keyboard button to indicate failure.
+                        else
+                        {
+                            allCorrect = false; // Not all letters are correct.
+                            textBox.BackColor = Color.Gray; // Mark as incorrect.
+                            textBox.ForeColor = Color.White;
 
-                        // Deduct points from the player's score.
-                        UpdateScore(-3);
+                            keyboardButtons[textBox.Text[0]].BackColor = Color.Gray; // Update keyboard button.
+                            keyboardButtons[textBox.Text[0]].ForeColor = Color.White;
+
+                            // Deduct points from the player's score.
+                            UpdateScore(-3);
+                        }
+                        // Set the TextBox to read-only to prevent further editing.
+                        textBox.ReadOnly = true;
                     }
-                    // Set the TextBox to read-only to prevent further editing.
-                    textBox.ReadOnly = true;
                 }
             }
-
+            else
+            {
+                cheekyLabel.Text = "That word is a little questionable. How about giving it another shot with a valid one?";
+                return;
+            }
             // Enable the next TextBox for user input if there are attempts remaining.
             if (submitButtonIndex + 1 != NumberOfAttempts)
             {
@@ -433,6 +657,7 @@ public partial class Form1 : Form
             {
                 Random random = new Random();
                 cheekyLabel.Text = cheekyLabels[random.Next(0, cheekyLabels.Length)];
+
             }
         }
 
@@ -533,42 +758,46 @@ public partial class Form1 : Form
             scorePanel.Location = new Point((keyboardPanel.Width > flowLayoutPanel.Width ? keyboardPanel.Right : flowLayoutPanel.Right) + 20, 30);
             scorePanel.Size = new Size(180, flowLayoutPanel.Height + keyboardPanel.Height);
             scorePanel.BorderStyle = BorderStyle.FixedSingle;
+            scorePanel.BackColor = Color.FromArgb(255, 182, 193);
 
             scoreLabel = new Label();
             scoreLabel.Text = "Score: " + score.ToString();
-            scoreLabel.Font = new Font("Arial", 16, FontStyle.Bold);
+            scoreLabel.Font = new Font("Comic Sans MS", 16, FontStyle.Bold);
             scoreLabel.Location = new Point(10, 10);
             scoreLabel.AutoSize = true;
+            scoreLabel.ForeColor = Color.White;
 
             scorePanel.Controls.Add(scoreLabel);
 
 
             highestScoreLabel = new Label();
             highestScoreLabel.Text = "Highest score: " + highScore.ToString();
-            highestScoreLabel.Font = new Font("Arial", 10, FontStyle.Bold);
+            highestScoreLabel.Font = new Font("Comic Sans MS", 10, FontStyle.Bold);
             highestScoreLabel.Location = new Point(10, scoreLabel.Bottom + 20);
             highestScoreLabel.AutoSize = true;
+            highestScoreLabel.ForeColor = Color.White;
+
             scorePanel.Controls.Add(this.highestScoreLabel);
 
             Button newGameButton = new Button();
             newGameButton.Text = "New Game";
             newGameButton.Size = new Size(150, 40);
             newGameButton.Location = new Point(15, highestScoreLabel.Bottom + 20);
-            newGameButton.BackColor = Color.LightSkyBlue;
-            newGameButton.Font = new Font("Arial", 12, FontStyle.Bold);
+            newGameButton.BackColor = Color.FromArgb(198, 225, 233);
+            newGameButton.Font = new Font("Comic Sans MS", 12, FontStyle.Bold);
 
             newGameButton.Click += new EventHandler(NewGameButton_Click);
             scorePanel.Controls.Add(newGameButton);
 
             cheekyLabel = new Label();
-            cheekyLabel.Text = ""; 
-            cheekyLabel.Font = new Font("Arial", 12, FontStyle.Italic);
+            cheekyLabel.Text = "";
+            cheekyLabel.Font = new Font("Comic Sans MS", 12, FontStyle.Italic);
             cheekyLabel.ForeColor = Color.DarkRed;
-            cheekyLabel.AutoSize = false; 
+            cheekyLabel.AutoSize = false;
 
-            cheekyLabel.Size = new Size(150, 150); 
-            cheekyLabel.Location = new Point(15, newGameButton.Bottom + 20); 
-
+            cheekyLabel.Size = new Size(150, 300);
+            cheekyLabel.Location = new Point(15, newGameButton.Bottom + 20);
+            cheekyLabel.TextAlign = ContentAlignment.MiddleCenter;
             scorePanel.Controls.Add(cheekyLabel);
 
             this.Controls.Add(scorePanel);
@@ -607,13 +836,13 @@ public partial class Form1 : Form
         /// <param name="change">The amount to change the score by. Can be positive or negative.</param>
         private void UpdateScore(int change)
         {
-            score += change; 
-            scoreLabel.Text = "Score: " + score; 
+            score += change;
+            scoreLabel.Text = "Score: " + score;
 
             if (score > highScore)
             {
-                highScore = score; 
-                highestScoreLabel.Text = "Highest Score: " + highScore; 
+                highScore = score;
+                highestScoreLabel.Text = "Highest Score: " + highScore;
             }
         }
 
@@ -634,12 +863,15 @@ public partial class Form1 : Form
         {
             this.Controls.Clear();
             InitializeComponent();
-
-            numericUpDown1.Visible = true;
-            numericUpDown2.Visible = true;
+            CustomizeStartButton();
+            LoadHighScore();
+            CustomizeLabels();
+            CustomizeControls();
+            attemptsNr.Visible = true;
+            wordLen.Visible = true;
             label1.Visible = true;
             labelresponseinput.Visible = true;
-            button1.Visible = true;
+            startButton.Visible = true;
 
             score = 500;
         }
@@ -685,8 +917,8 @@ public partial class Form1 : Form
                 letterButton.Text = letter.ToString();
                 letterButton.Size = buttonSize;
                 letterButton.Location = new Point(x, y);
-                letterButton.Font = new Font("Arial", 14, FontStyle.Bold);
-
+                letterButton.Font = new Font("Comic Sans MS", 14, FontStyle.Bold);
+                letterButton.Padding = new Padding(0, 0, 0, 0);
                 letterButton.Click += (s, e) => Keyboard_Click(letterButton);
 
                 keyboardPanel.Controls.Add(letterButton);
@@ -705,13 +937,13 @@ public partial class Form1 : Form
             backspaceButton.Text = "←";
             backspaceButton.ForeColor = Color.Black;
             backspaceButton.Location = new Point(x, y);
-            backspaceButton.Height = 40;
-            backspaceButton.Font = new Font("Arial", 14, FontStyle.Bold);
+            backspaceButton.Height = buttonSize.Height;
+            backspaceButton.Font = new Font("Comic Sans MS", 14, FontStyle.Bold);
             keyboardPanel.Controls.Add(backspaceButton);
 
             backspaceButton.Click += new System.EventHandler(Backspace_Click);
         }
-        
+
         /// <summary>
         /// Handles the click event for the backspace button. This method clears the text in the most 
         /// recently used editable text box within the flow layout panel, simulating a backspace action.
@@ -812,7 +1044,7 @@ public partial class Form1 : Form
         /// Retrieves a random word of a specified length from a text file and populates the letter count dictionary.
         /// 
         /// The method works as follows:
-        /// 1. It reads the selected word length from a numeric input (numericUpDown2).
+        /// 1. It reads the selected word length from a numeric input (wordLen).
         /// 2. It constructs the filename based on the specified word length, expecting a text file containing words of that length.
         /// 3. It reads all lines from the specified text file and stores them in a list.
         /// 4. A random number is generated to select an index from the list of words.
@@ -824,7 +1056,7 @@ public partial class Form1 : Form
         /// <returns>A randomly selected word from the corresponding text file.</returns>
         private string GetWord()
         {
-            string wordLength = numericUpDown2.Value.ToString();
+            string wordLength = wordLen.Value.ToString();
             List<string> words = new List<string>();
             string filename = "words/" + wordLength + ".txt";
             using (StreamReader sr = new StreamReader(filename))
@@ -843,6 +1075,31 @@ public partial class Form1 : Form
 
             return word;
         }
+
+
+        /// <summary>
+        /// Checks if the given word is valid by comparing it against a list of words stored in a text file.
+        /// </summary>
+        /// <param name="wordToCheck">The word that needs to be validated.</param>
+        /// <returns>
+        /// Returns true if the word exists in the specified word list file; otherwise, returns false.
+        /// </returns>
+        private bool checkValidWord(string wordToCheck)
+        {
+            string wordLength = wordLen.Value.ToString();
+            //List<string> words = new List<string>();
+            string filename = "words/" + wordLength + ".txt";
+            using (StreamReader sr = new StreamReader(filename))
+            {
+                while (sr.Peek() >= 0)
+                {
+                    if (sr.ReadLine() == wordToCheck) return true;
+                }
+            }
+
+            return false;
+        }
+
 
         /// <summary>
         /// Handles key press events for the main form, allowing for interaction with the game using keyboard inputs.
@@ -953,3 +1210,13 @@ public partial class Form1 : Form
 
     }
 }
+
+
+
+
+
+
+
+
+
+
